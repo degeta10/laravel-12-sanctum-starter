@@ -8,9 +8,9 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class AuthController extends Controller
 {
@@ -70,6 +70,35 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->user()->tokens()->delete();
+        return response()->success(
+            Response::HTTP_OK,
+            'Logged out successfully',
+        );
+    }
+
+    public function webLogin(LoginRequest $request)
+    {
+        if (!Auth::attempt($request->validated())) {
+            return response()->error(
+                Response::HTTP_UNAUTHORIZED,
+                'Invalid credentials',
+            );
+        }
+
+        $request->session()->regenerate();
+
+        return response()->success(
+            Response::HTTP_OK,
+            'Login successful',
+            $request->user()
+        );
+    }
+
+    public function webLogout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
