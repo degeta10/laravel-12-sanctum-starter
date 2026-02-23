@@ -101,7 +101,6 @@ class Handler
      */
     public function internalResponse(Throwable $e)
     {
-        dd($e);
         return response()->error(
             Response::HTTP_INTERNAL_SERVER_ERROR,
             'Internal server error',
@@ -123,7 +122,7 @@ class Handler
     /**
      * Render the exception response
      */
-    public function render(Throwable $e)
+    public function render($request, Throwable $e)
     {
         if ($this->isThrottle($e)) {
             return $this->throttleResponse($e);
