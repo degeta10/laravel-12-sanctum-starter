@@ -8,9 +8,9 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 
 class AuthController extends Controller
 {
@@ -90,13 +90,13 @@ class AuthController extends Controller
         return response()->success(
             Response::HTTP_OK,
             'Login successful',
-            $request->user()
+            new UserResource($request->user())
         );
     }
 
     public function webLogout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return response()->success(
