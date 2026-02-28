@@ -35,14 +35,17 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+        return $request->hasSession()
+            ? $this->webLogin($request)
+            : $this->apiLogin($request);
+    }
+
+    private function apiLogin(LoginRequest $request)
+    {
         $user = $this->authService->authenticate($request->validated());
 
         if (!$user) {
-            return response()->error(
-                Response::HTTP_UNAUTHORIZED,
-                'Invalid credentials',
-
-            );
+            return response()->error(401, 'Invalid credentials');
         }
 
         $token = $this->authService->generateToken($user);
@@ -54,25 +57,6 @@ class AuthController extends Controller
                 'access_token' => $token,
                 'user' => $user
             ])
-        );
-    }
-
-    public function me()
-    {
-        $user = auth()->user();
-        return response()->success(
-            Response::HTTP_OK,
-            'User details retrieved successfully',
-            new UserResource($user),
-        );
-    }
-
-    public function logout()
-    {
-        auth()->user()->tokens()->delete();
-        return response()->success(
-            Response::HTTP_OK,
-            'Logged out successfully',
         );
     }
 
@@ -91,6 +75,32 @@ class AuthController extends Controller
             Response::HTTP_OK,
             'Login successful',
             new UserResource($request->user())
+        );
+    }
+
+    public function me()
+    {
+        $user = auth()->user();
+        return response()->success(
+            Response::HTTP_OK,
+            'User details retrieved successfully',
+            new UserResource($user),
+        );
+    }
+
+    public function logout(Request $request)
+    {
+        return $request->hasSession()
+            ? $this->webLogout($request)
+            : $this->apiLogout();
+    }
+
+    public function apiLogout()
+    {
+        auth()->user()->tokens()->delete();
+        return response()->success(
+            Response::HTTP_OK,
+            'Logged out successfully',
         );
     }
 

@@ -26,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) use ($handler): void {
         $exceptions->renderable(function (Throwable $e, $request) use ($handler) {
             if ($request->expectsJson()) {
-                return $handler->render($request, $e);
+                return $handler->render($e);
             }
         });
     })
