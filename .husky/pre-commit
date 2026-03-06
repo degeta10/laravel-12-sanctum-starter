@@ -1,4 +1,4 @@
 #!/bin/sh
 
 ./vendor/bin/sail pint --dirty
-# ./vendor/bin/sail test
+./vendor/bin/sail test
