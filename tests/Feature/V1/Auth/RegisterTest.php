@@ -23,11 +23,11 @@ class RegisterTest extends ApiV1TestCase
             ->assertJsonStructure([
                 'success',
                 'message',
-                'data'
+                'data',
             ]);
 
         $this->assertDatabaseHas('users', [
-            'email' => 'john@example.com'
+            'email' => 'john@example.com',
         ]);
     }
 }

@@ -21,7 +21,7 @@ class MeTest extends ApiV1TestCase
                 'data' => [
                     'name',
                     'email',
-                ]
+                ],
             ])
             ->assertJsonPath('data.name', $user->name)
             ->assertJsonPath('data.email', $user->email);

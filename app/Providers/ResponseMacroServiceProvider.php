@@ -2,9 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Response;
-
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
 class ResponseMacroServiceProvider extends ServiceProvider
@@ -24,10 +23,10 @@ class ResponseMacroServiceProvider extends ServiceProvider
     {
         /**
          * Success response macro
-         * 
-         * @param mixed $data - Response data
-         * @param string $message - Response message
-         * @param int $code - HTTP status code
+         *
+         * @param  mixed  $data  - Response data
+         * @param  string  $message  - Response message
+         * @param  int  $code  - HTTP status code
          */
         Response::macro('success', function (
             $code = HttpResponse::HTTP_OK,
@@ -41,13 +40,12 @@ class ResponseMacroServiceProvider extends ServiceProvider
             ], $code);
         });
 
-
         /**
          * Error response macro
-         * 
-         * @param string $message - Error message
-         * @param array $errors - Validation errors or additional error details
-         * @param int $code - HTTP status code
+         *
+         * @param  string  $message  - Error message
+         * @param  array  $errors  - Validation errors or additional error details
+         * @param  int  $code  - HTTP status code
          */
         Response::macro('error', function (
             int $code = HttpResponse::HTTP_INTERNAL_SERVER_ERROR,

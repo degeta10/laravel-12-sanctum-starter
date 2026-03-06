@@ -50,7 +50,7 @@ class User extends Authenticatable
 
     /**
      * Mutator to hash the password when setting it
-     * 
+     *
      * This is an alternative to using the 'hashed' cast, and allows for more control over when hashing occurs.
      */
     public function setPasswordAttribute($value)

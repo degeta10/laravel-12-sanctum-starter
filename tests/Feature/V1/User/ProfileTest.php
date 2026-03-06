@@ -23,7 +23,7 @@ class ProfileTest extends ApiV1TestCase
                 'data' => [
                     'email',
                     'name',
-                ]
+                ],
             ])
             ->assertJsonPath('data.name', $updatedName);
     }
@@ -46,7 +46,7 @@ class ProfileTest extends ApiV1TestCase
                 'data' => [
                     'email',
                     'name',
-                ]
+                ],
             ]);
     }
 }

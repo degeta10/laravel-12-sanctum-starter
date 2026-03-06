@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
@@ -19,7 +18,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $this->authService->createUser($request->validated());
+        $this->authService->registerUser($request->validated());
 
         return response()->success(
             Response::HTTP_CREATED,
@@ -38,7 +37,7 @@ class AuthController extends Controller
     {
         $user = $this->authService->authenticate($request->validated());
 
-        if (!$user) {
+        if (! $user) {
             return response()->error(401, 'Invalid credentials');
         }
 
@@ -49,14 +48,14 @@ class AuthController extends Controller
             'Login successful',
             new AuthResource([
                 'access_token' => $token,
-                'user' => $user
+                'user' => $user,
             ])
         );
     }
 
     public function webLogin(LoginRequest $request)
     {
-        if (!Auth::attempt($request->validated())) {
+        if (! Auth::attempt($request->validated())) {
             return response()->error(
                 Response::HTTP_UNAUTHORIZED,
                 'Invalid credentials',
@@ -75,6 +74,7 @@ class AuthController extends Controller
     public function me()
     {
         $user = auth()->user();
+
         return response()->success(
             Response::HTTP_OK,
             'User details retrieved successfully',
@@ -92,6 +92,7 @@ class AuthController extends Controller
     public function apiLogout()
     {
         auth()->user()->tokens()->delete();
+
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
@@ -103,23 +104,10 @@ class AuthController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
-        );
-    }
-
-    public function updateProfile(UpdateProfileRequest $request)
-    {
-        $updatedUser = $this->authService->updateUser(
-            auth()->user(),
-            $request->validated()
-        );
-
-        return response()->success(
-            Response::HTTP_OK,
-            'Profile updated successfully',
-            new UserResource($updatedUser),
         );
     }
 }

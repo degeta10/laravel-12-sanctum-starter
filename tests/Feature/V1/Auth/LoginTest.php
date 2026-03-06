@@ -5,7 +5,6 @@ namespace Tests\Feature\V1\Auth;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\ApiV1TestCase;
 
-
 class LoginTest extends ApiV1TestCase
 {
     #[Test]
@@ -26,9 +25,9 @@ class LoginTest extends ApiV1TestCase
                     'access_token',
                     'user' => [
                         'name',
-                        'email'
-                    ]
-                ]
+                        'email',
+                    ],
+                ],
             ]);
     }
 
