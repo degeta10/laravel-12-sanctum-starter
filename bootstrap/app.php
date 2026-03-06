@@ -1,10 +1,13 @@
 <?php
 
-
 use App\Exceptions\Handler;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+
+$handler = new Handler();
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,15 +17,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->api(
+            prepend: [
+                EnsureFrontendRequestsAreStateful::class,
+            ]
+        );
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        $handler = new Handler();
-
-        // Handle general exceptions with custom handler
+    ->withExceptions(function (Exceptions $exceptions) use ($handler): void {
         $exceptions->renderable(function (Throwable $e, $request) use ($handler) {
-            if ($request->wantsJson()) {
+            if ($request->expectsJson()) {
                 return $handler->render($e);
             }
         });
-    })->create();
+    })
+    ->create();

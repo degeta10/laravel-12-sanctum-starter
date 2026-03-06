@@ -8,9 +8,9 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -35,14 +35,17 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
+        return $request->hasSession()
+            ? $this->webLogin($request)
+            : $this->apiLogin($request);
+    }
+
+    private function apiLogin(LoginRequest $request)
+    {
         $user = $this->authService->authenticate($request->validated());
 
         if (!$user) {
-            return response()->error(
-                Response::HTTP_UNAUTHORIZED,
-                'Invalid credentials',
-
-            );
+            return response()->error(401, 'Invalid credentials');
         }
 
         $token = $this->authService->generateToken($user);
@@ -57,6 +60,24 @@ class AuthController extends Controller
         );
     }
 
+    public function webLogin(LoginRequest $request)
+    {
+        if (!Auth::attempt($request->validated())) {
+            return response()->error(
+                Response::HTTP_UNAUTHORIZED,
+                'Invalid credentials',
+            );
+        }
+
+        $request->session()->regenerate();
+
+        return response()->success(
+            Response::HTTP_OK,
+            'Login successful',
+            new UserResource($request->user())
+        );
+    }
+
     public function me()
     {
         $user = auth()->user();
@@ -67,9 +88,27 @@ class AuthController extends Controller
         );
     }
 
-    public function logout()
+    public function logout(Request $request)
+    {
+        return $request->hasSession()
+            ? $this->webLogout($request)
+            : $this->apiLogout();
+    }
+
+    public function apiLogout()
     {
         auth()->user()->tokens()->delete();
+        return response()->success(
+            Response::HTTP_OK,
+            'Logged out successfully',
+        );
+    }
+
+    public function webLogout(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
