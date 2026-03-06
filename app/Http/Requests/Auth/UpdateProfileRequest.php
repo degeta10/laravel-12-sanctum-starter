@@ -22,7 +22,7 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'string', 'max:255'],
             'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
         ];
     }
@@ -35,11 +35,8 @@ class UpdateProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email is required.',
-            'email.email' => 'Email must be a valid email address.',
-            'email.unique' => 'Email is already taken.',
-            'name.required' => 'Name is required.',
             'name.string' => 'Name must be a string.',
+            'name.max' => 'Name must not exceed 255 characters.',
             'password.sometimes' => 'Password is required.',
             'password.string' => 'Password must be a string.',
             'password.min' => 'Password must be at least 8 characters.',
