@@ -34,11 +34,13 @@ class AuthService
 
     public function createUser(array $data): User
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'email_verified_at' => now(),
-        ]);
+        $data['email_verified_at'] = now();
+        return User::create($data);
+    }
+
+    public function updateUser(User $user, array $data): User
+    {
+        $user->update($data);
+        return $user->refresh();
     }
 }

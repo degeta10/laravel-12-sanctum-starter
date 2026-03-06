@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
@@ -18,14 +19,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $user = $this->authService->createUser($request->validated());
-
-        if (!$user) {
-            return response()->error(
-                Response::HTTP_INTERNAL_SERVER_ERROR,
-                'Registration failed. Please try again.',
-            );
-        }
+        $this->authService->createUser($request->validated());
 
         return response()->success(
             Response::HTTP_CREATED,
@@ -112,6 +106,20 @@ class AuthController extends Controller
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
+        );
+    }
+
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $updatedUser = $this->authService->updateUser(
+            auth()->user(),
+            $request->validated()
+        );
+
+        return response()->success(
+            Response::HTTP_OK,
+            'Profile updated successfully',
+            new UserResource($updatedUser),
         );
     }
 }
