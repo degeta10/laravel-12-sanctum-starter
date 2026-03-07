@@ -8,6 +8,7 @@ use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class AuthController extends Controller
 {
     public function __construct(private readonly AuthService $authService) {}
 
-    public function register(RegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
         $this->authService->registerUser($request->validated());
 
@@ -26,19 +27,19 @@ class AuthController extends Controller
         );
     }
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         return $request->hasSession()
             ? $this->webLogin($request)
             : $this->apiLogin($request);
     }
 
-    private function apiLogin(LoginRequest $request)
+    private function apiLogin(LoginRequest $request): JsonResponse
     {
         $user = $this->authService->authenticate($request->validated());
 
         if (! $user) {
-            return response()->error(401, 'Invalid credentials');
+            return response()->error(Response::HTTP_UNAUTHORIZED, 'Invalid credentials');
         }
 
         $token = $this->authService->generateToken($user);
@@ -53,7 +54,7 @@ class AuthController extends Controller
         );
     }
 
-    public function webLogin(LoginRequest $request)
+    public function webLogin(LoginRequest $request): JsonResponse
     {
         if (! Auth::attempt($request->validated())) {
             return response()->error(
@@ -71,9 +72,9 @@ class AuthController extends Controller
         );
     }
 
-    public function me()
+    public function me(Request $request): JsonResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
 
         return response()->success(
             Response::HTTP_OK,
@@ -82,16 +83,16 @@ class AuthController extends Controller
         );
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         return $request->hasSession()
             ? $this->webLogout($request)
-            : $this->apiLogout();
+            : $this->apiLogout($request);
     }
 
-    public function apiLogout()
+    public function apiLogout(Request $request): JsonResponse
     {
-        auth()->user()->tokens()->delete();
+        $request->user()?->currentAccessToken()?->delete();
 
         return response()->success(
             Response::HTTP_OK,
@@ -99,7 +100,7 @@ class AuthController extends Controller
         );
     }
 
-    public function webLogout(Request $request)
+    public function webLogout(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();
         $request->session()->invalidate();

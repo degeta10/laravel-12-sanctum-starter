@@ -22,8 +22,17 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
-            'password' => ['sometimes', 'string', 'min:8', 'confirmed'],
+            'name' => [
+                'sometimes',
+                'string',
+                'max:255',
+            ],
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
         ];
     }
 
@@ -37,7 +46,6 @@ class UpdateProfileRequest extends FormRequest
         return [
             'name.string' => 'Name must be a string.',
             'name.max' => 'Name must not exceed 255 characters.',
-            'password.sometimes' => 'Password is required.',
             'password.string' => 'Password must be a string.',
             'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',

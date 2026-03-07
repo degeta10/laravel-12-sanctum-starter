@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -23,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'email_verified_at',
     ];
 
     /**
@@ -48,13 +48,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Mutator to hash the password when setting it
-     *
-     * This is an alternative to using the 'hashed' cast, and allows for more control over when hashing occurs.
-     */
-    public function setPasswordAttribute($value)
+    public function scopeVerified(Builder $query): Builder
     {
-        $this->attributes['password'] = Hash::make($value);
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    public function scopeUnverified(Builder $query): Builder
+    {
+        return $query->whereNull('email_verified_at');
     }
 }

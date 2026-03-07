@@ -13,15 +13,7 @@ class AuthService
     {
         $user = User::where('email', $data['email'])->first();
 
-        if (! $user) {
-            return null;
-        }
-
-        if (! Hash::check($data['password'], $user->password)) {
-            return null;
-        }
-
-        if (! $user->hasVerifiedEmail()) {
+        if (! $user || ! Hash::check($data['password'], $user->password)) {
             return null;
         }
 

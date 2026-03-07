@@ -52,8 +52,14 @@ class LoginTest extends ApiV1TestCase
         $user = $this->createUser();
 
         $payloads = [
-            ['email' => 'wrong@email.com', 'password' => $this->userPassword],
-            ['email' => $user->email, 'password' => 'wrong-pass'],
+            [
+                'email' => 'wrong@email.com',
+                'password' => $this->userPassword,
+            ],
+            [
+                'email' => $user->email,
+                'password' => 'wrongpass',
+            ],
         ];
 
         foreach ($payloads as $payload) {
