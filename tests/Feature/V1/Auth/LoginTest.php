@@ -7,12 +7,14 @@ use Tests\ApiV1TestCase;
 
 class LoginTest extends ApiV1TestCase
 {
+    private const LOGIN_URL = '/auth/login';
+
     #[Test]
-    public function api_user_can_login_with_token(): void
+    public function login_returns_bearer_token_for_stateless_requests(): void
     {
         $user = $this->createUser();
 
-        $this->postApi('/auth/login', [
+        $this->postApi(self::LOGIN_URL, [
             'email' => $user->email,
             'password' => $this->userPassword,
         ])
@@ -32,11 +34,11 @@ class LoginTest extends ApiV1TestCase
     }
 
     #[Test]
-    public function web_user_can_login_with_session(): void
+    public function login_creates_session_for_stateful_requests(): void
     {
         $user = $this->createUser();
 
-        $this->postWeb('/auth/login', [
+        $this->postWeb(self::LOGIN_URL, [
             'email' => $user->email,
             'password' => $this->userPassword,
         ])
@@ -63,7 +65,7 @@ class LoginTest extends ApiV1TestCase
         ];
 
         foreach ($payloads as $payload) {
-            $this->postApi('/auth/login', $payload)->assertUnauthorized();
+            $this->postApi(self::LOGIN_URL, $payload)->assertUnauthorized();
         }
     }
 }
