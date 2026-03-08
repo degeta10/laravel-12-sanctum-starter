@@ -216,8 +216,22 @@ Content-Type: application/json
 #### Get Authenticated User
 
 ```http
-GET /api/v1/auth/me
+GET /api/v1/me
 Authorization: Bearer {token}
+```
+
+#### Update Authenticated User
+
+```http
+PATCH /api/v1/me
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "John Updated",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
 ```
 
 #### Logout
@@ -229,16 +243,22 @@ Authorization: Bearer {token}
 
 ### User Endpoints
 
-#### Update Profile
+#### Get User Profile
 
 ```http
-PUT /api/v1/user/profile
+GET /api/v1/me
+Authorization: Bearer {token}
+```
+
+#### Update User Profile
+
+```http
+PATCH /api/v1/me
 Authorization: Bearer {token}
 Content-Type: application/json
 
 {
-  "name": "John Updated",
-  "email": "updated@example.com"
+  "name": "John Updated"
 }
 ```
 
@@ -334,11 +354,14 @@ app/
 │   │       └── UserController.php
 │   ├── Requests/
 │   └── Resources/
+├── Actions/
+│   └── Auth/
+│       ├── ApiLoginUserAction.php
+│       ├── ApiLogoutUserAction.php
+│       ├── WebLoginUserAction.php
+│       └── WebLogoutUserAction.php
 ├── Models/
 │   └── User.php
-├── Services/
-│   ├── AuthService.php
-│   └── UserService.php
 └── Providers/
     ├── AppServiceProvider.php
     └── ResponseMacroServiceProvider.php

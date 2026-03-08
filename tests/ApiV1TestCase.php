@@ -49,6 +49,11 @@ abstract class ApiV1TestCase extends BaseTestCase
         return $this->putJson($this->baseUrl.$uri, $data, $headers);
     }
 
+    protected function patchApi(string $uri, array $data = [], array $headers = [])
+    {
+        return $this->patchJson($this->baseUrl.$uri, $data, $headers);
+    }
+
     protected function deleteApi(string $uri, array $headers = [])
     {
         return $this->deleteJson($this->baseUrl.$uri, [], $headers);

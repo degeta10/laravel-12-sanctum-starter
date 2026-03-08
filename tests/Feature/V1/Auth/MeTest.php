@@ -12,7 +12,7 @@ class MeTest extends ApiV1TestCase
     {
         $user = $this->authUser();
 
-        $response = $this->getApi('/auth/me');
+        $response = $this->getApi('/me');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -30,7 +30,7 @@ class MeTest extends ApiV1TestCase
     #[Test]
     public function guest_cannot_access_me_endpoint(): void
     {
-        $response = $this->getApi('/auth/me');
+        $response = $this->getApi('/me');
         $response->assertUnauthorized();
     }
 }
