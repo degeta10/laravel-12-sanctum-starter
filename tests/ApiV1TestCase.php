@@ -17,7 +17,7 @@ abstract class ApiV1TestCase extends BaseTestCase
 
     protected function authUser(?User $user = null): User
     {
-        $user = $user ?? User::factory()->create();
+        $user ??= User::factory()->create();
         Sanctum::actingAs($user, ['*']);
 
         return $user;

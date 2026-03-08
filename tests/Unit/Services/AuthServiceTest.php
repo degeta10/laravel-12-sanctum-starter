@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Services\AuthService;
 use App\Services\UserService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 use Mockery;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -96,12 +95,10 @@ class AuthServiceTest extends TestCase
         $userService
             ->shouldReceive('createUser')
             ->once()
-            ->withArgs(function (array $data) use ($payload): bool {
-                return $data['name'] === $payload['name']
-                    && $data['email'] === $payload['email']
-                    && $data['password'] === $payload['password']
-                    && isset($data['email_verified_at']);
-            })
+            ->withArgs(fn (array $data): bool => $data['name'] === $payload['name']
+                && $data['email'] === $payload['email']
+                && $data['password'] === $payload['password']
+                && isset($data['email_verified_at']))
             ->andReturn($expectedUser);
 
         $service = new AuthService($userService);

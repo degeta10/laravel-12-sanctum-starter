@@ -28,17 +28,15 @@ class ResponseMacroServiceProvider extends ServiceProvider
          * @param  string  $message  - Response message
          * @param  int  $code  - HTTP status code
          */
-        Response::macro('success', function (
-            $code = HttpResponse::HTTP_OK,
-            $message = 'Success',
+        Response::macro('success', fn (
+            int $code = HttpResponse::HTTP_OK,
+            string $message = 'Success',
             $data = null
-        ) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => $data,
-            ], $code);
-        });
+        ) => response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => $data,
+        ], $code));
 
         /**
          * Error response macro
@@ -47,16 +45,14 @@ class ResponseMacroServiceProvider extends ServiceProvider
          * @param  array  $errors  - Validation errors or additional error details
          * @param  int  $code  - HTTP status code
          */
-        Response::macro('error', function (
+        Response::macro('error', fn (
             int $code = HttpResponse::HTTP_INTERNAL_SERVER_ERROR,
             string $message = 'Error',
             array $errors = []
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => $message,
-                'errors' => $errors,
-            ], $code);
-        });
+        ) => response()->json([
+            'success' => false,
+            'message' => $message,
+            'errors' => $errors,
+        ], $code));
     }
 }
