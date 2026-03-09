@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Providers;
 
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\ServiceProvider;
 
-class ResponseMacroServiceProvider extends ServiceProvider
+final class ResponseMacroServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

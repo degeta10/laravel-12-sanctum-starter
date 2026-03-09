@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class LoginRequest extends FormRequest
+final class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -12,16 +14,6 @@ class LoginRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-    }
-
-    /**
-     * Prepare the data for validation.
-     */
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'email' => is_string($this->email) ? strtolower(trim($this->email)) : $this->email,
-        ]);
     }
 
     /**
@@ -58,5 +50,15 @@ class LoginRequest extends FormRequest
             'password.required' => 'Password is required.',
             'password.string' => 'Password must be a string.',
         ];
+    }
+
+    /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'email' => is_string($this->email) ? mb_strtolower(mb_trim($this->email)) : $this->email,
+        ]);
     }
 }

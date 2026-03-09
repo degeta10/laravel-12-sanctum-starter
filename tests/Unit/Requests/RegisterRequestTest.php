@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Requests;
 
 use App\Http\Requests\Auth\RegisterRequest;
@@ -10,7 +12,7 @@ use PHPUnit\Framework\Attributes\Test;
 use ReflectionMethod;
 use Tests\TestCase;
 
-class RegisterRequestTest extends TestCase
+final class RegisterRequestTest extends TestCase
 {
     use RefreshDatabase;
 

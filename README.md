@@ -190,7 +190,7 @@ Then you can use `sail` instead of `./vendor/bin/sail`.
 #### Register
 
 ```http
-POST /api/v1/auth/register
+POST /api/v1/register
 Content-Type: application/json
 
 {
@@ -204,7 +204,7 @@ Content-Type: application/json
 #### Login
 
 ```http
-POST /api/v1/auth/login
+POST /api/v1/login
 Content-Type: application/json
 
 {
@@ -237,7 +237,7 @@ Content-Type: application/json
 #### Logout
 
 ```http
-POST /api/v1/auth/logout
+POST /api/v1/logout
 Authorization: Bearer {token}
 ```
 

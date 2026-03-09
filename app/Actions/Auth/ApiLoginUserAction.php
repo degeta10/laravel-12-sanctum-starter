@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class ApiLoginUserAction
+final class ApiLoginUserAction
 {
     public function execute(array $credentials): ?array
     {
@@ -15,7 +17,7 @@ class ApiLoginUserAction
             return null;
         }
 
-        $token = $user->createToken("auth_token_{$user->id}")
+        $token = $user->createToken('auth_token_'.$user->id)
             ->plainTextToken;
 
         return [

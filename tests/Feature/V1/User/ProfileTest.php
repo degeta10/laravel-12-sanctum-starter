@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\V1\User;
 
 use PHPUnit\Framework\Attributes\Test;
 use Tests\ApiV1TestCase;
 
-class ProfileTest extends ApiV1TestCase
+final class ProfileTest extends ApiV1TestCase
 {
     #[Test]
     public function user_can_view_profile(): void

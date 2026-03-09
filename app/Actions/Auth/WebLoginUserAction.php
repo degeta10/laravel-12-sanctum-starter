@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class WebLoginUserAction
+final class WebLoginUserAction
 {
     public function execute(array $credentials, Request $request): ?User
     {

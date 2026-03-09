@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\V1\Auth;
 
 use PHPUnit\Framework\Attributes\Test;
 use Tests\ApiV1TestCase;
 
-class LoginTest extends ApiV1TestCase
+final class LoginTest extends ApiV1TestCase
 {
-    private const LOGIN_URL = '/auth/login';
+    private const LOGIN_URL = '/login';
 
     #[Test]
     public function login_returns_bearer_token_for_stateless_requests(): void

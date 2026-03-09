@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-class RegisterUserAction
+final class RegisterUserAction
 {
     /**
      * Register a new user with the given data.
