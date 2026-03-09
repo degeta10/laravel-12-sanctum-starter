@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use App\Traits\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 final class Handler
 {
+    use ApiResponse;
+
     private array $map = [
         ThrottleRequestsException::class => [
             'status' => Response::HTTP_TOO_MANY_REQUESTS,
@@ -31,29 +35,30 @@ final class Handler
             'status' => Response::HTTP_NOT_FOUND,
             'message' => 'Incorrect route',
         ],
+        InternalErrorException::class => [
+            'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+            'message' => 'Internal server error',
+        ],
     ];
 
-    public function render(Throwable $e)
+    public function render(Throwable $e): \Illuminate\Http\JsonResponse
     {
         foreach ($this->map as $class => $config) {
             if ($e instanceof $class) {
-                return response()->error(
+                return $this->error(
+                    $config['message'],
                     $config['status'],
-                    $config['message']
                 );
             }
         }
 
         if ($e instanceof ValidationException) {
-            return response()->error(
-                Response::HTTP_UNPROCESSABLE_ENTITY,
-                'Validation failed',
+            return $this->validationError(
                 $e->errors()
             );
         }
 
-        return response()->error(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+        return $this->error(
             app()->isProduction()
                 ? 'Internal server error'
                 : $e->getMessage()

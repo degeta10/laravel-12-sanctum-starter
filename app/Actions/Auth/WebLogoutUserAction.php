@@ -9,10 +9,15 @@ use Illuminate\Support\Facades\Auth;
 
 final class WebLogoutUserAction
 {
-    public function execute(Request $request): void
+    /**
+     * Logout the user by invalidating their session.
+     */
+    public function execute(Request $request): bool
     {
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        return true;
     }
 }

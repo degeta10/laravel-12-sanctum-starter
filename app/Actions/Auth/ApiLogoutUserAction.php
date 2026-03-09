@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 
 final class ApiLogoutUserAction
 {
-    public function execute(Request $request): void
+    /**
+     * Logout the user by deleting their current access token.
+     */
+    public function execute(Request $request): bool
     {
-        $request->user()?->currentAccessToken()?->delete();
+        return (bool) $request->user()?->currentAccessToken()?->delete();
     }
 }

@@ -18,26 +18,21 @@ use App\Http\Resources\Api\V1\AuthResource;
 use App\Http\Resources\Api\V1\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 final class AuthController extends Controller
 {
     public function __construct(
-        private readonly ApiLoginUserAction $loginUserAction,
+        private readonly ApiLoginUserAction $apiLoginAction,
         private readonly WebLoginUserAction $webLoginAction,
         private readonly ApiLogoutUserAction $apiLogoutAction,
         private readonly WebLogoutUserAction $webLogoutAction,
-        private readonly UpdateMeAction $updateProfileAction,
     ) {}
 
     public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
         $action->execute($request->validated());
 
-        return response()->success(
-            Response::HTTP_CREATED,
-            'Registration successful. Please verify your email before logging in.'
-        );
+        return $this->created();
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -47,91 +42,61 @@ final class AuthController extends Controller
             : $this->apiLogin($request);
     }
 
-    public function webLogin(LoginRequest $request): JsonResponse
-    {
-        $user = $this->webLoginAction->execute($request->validated(), $request);
-
-        if (! $user instanceof \App\Models\User) {
-            return response()->error(
-                Response::HTTP_UNAUTHORIZED,
-                'Invalid credentials',
-            );
-        }
-
-        return response()->success(
-            Response::HTTP_OK,
-            'Login successful',
-            new UserResource($user)
-        );
-    }
-
     public function getMe(Request $request): JsonResponse
     {
         $user = $request->user();
 
-        return response()->success(
-            Response::HTTP_OK,
-            'User details retrieved successfully',
-            new UserResource($user),
+        return $this->success(
+            new UserResource($user)
         );
     }
 
-    public function updateMe(UpdateProfileRequest $request): JsonResponse
+    public function updateMe(UpdateProfileRequest $request, UpdateMeAction $action): JsonResponse
     {
-        $updatedUser = $this->updateProfileAction->execute(
+        $updatedUser = $action->execute(
             $request->user(),
             $request->validated()
         );
 
-        return response()->success(
-            Response::HTTP_OK,
-            'User details updated successfully',
+        return $this->success(
             new UserResource($updatedUser),
         );
     }
 
     public function logout(Request $request): JsonResponse
     {
-        return $request->hasSession()
-            ? $this->webLogout($request)
-            : $this->apiLogout($request);
-    }
+        if ($request->hasSession()) {
+            $this->webLogoutAction->execute($request);
+        } else {
+            $this->apiLogoutAction->execute($request);
+        }
 
-    public function apiLogout(Request $request): JsonResponse
-    {
-        $this->apiLogoutAction->execute($request);
-
-        return response()->success(
-            Response::HTTP_OK,
-            'Logged out successfully',
-        );
-    }
-
-    public function webLogout(Request $request): JsonResponse
-    {
-        $this->webLogoutAction->execute($request);
-
-        return response()->success(
-            Response::HTTP_OK,
-            'Logged out successfully',
-        );
+        return $this->success();
     }
 
     private function apiLogin(LoginRequest $request): JsonResponse
     {
-        $result = $this->loginUserAction->execute($request->validated());
+        $result = $this->apiLoginAction->execute($request->validated());
 
         if (! $result) {
-            return response()->error(Response::HTTP_UNAUTHORIZED, 'Invalid credentials');
+            return $this->unauthorized('Invalid credentials');
         }
 
-        return response()->success(
-            Response::HTTP_OK,
-            'Login successful',
-            new AuthResource([
-                'access_token' => $result['token'],
-                'user' => $result['user'],
-            ])
+        return $this->success(
+            new AuthResource($result)
+        );
+    }
+
+    private function webLogin(LoginRequest $request): JsonResponse
+    {
+        $user = $this->webLoginAction->execute($request->validated(), $request);
+
+        if (!$user instanceof \App\Models\User) {
+            return $this->unauthorized('Invalid credentials');
+        }
+
+        return $this->success(
+            new UserResource($user)
         );
     }
 }
