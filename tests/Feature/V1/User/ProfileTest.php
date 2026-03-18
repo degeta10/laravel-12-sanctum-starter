@@ -8,12 +8,31 @@ use Tests\ApiV1TestCase;
 class ProfileTest extends ApiV1TestCase
 {
     #[Test]
+    public function user_can_view_profile(): void
+    {
+        $user = $this->authUser();
+
+        $this->getApi('/me')
+            ->assertOk()
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => [
+                    'email',
+                    'name',
+                ],
+            ])
+            ->assertJsonPath('data.email', $user->email)
+            ->assertJsonPath('data.name', $user->name);
+    }
+
+    #[Test]
     public function user_can_update_name_in_profile(): void
     {
         $this->authUser();
         $updatedName = 'Jane Doe';
 
-        $this->putApi('/user/profile', [
+        $this->patchApi('/me', [
             'name' => $updatedName,
         ])
             ->assertOk()
@@ -34,7 +53,7 @@ class ProfileTest extends ApiV1TestCase
         $user = $this->authUser();
         $updatedPassword = 'new-password';
 
-        $this->putApi('/user/profile', [
+        $this->patchApi('/me', [
             'name' => $user->name,
             'password' => $updatedPassword,
             'password_confirmation' => $updatedPassword,
@@ -48,5 +67,21 @@ class ProfileTest extends ApiV1TestCase
                     'name',
                 ],
             ]);
+    }
+
+    #[Test]
+    public function unauthenticated_user_cannot_view_profile(): void
+    {
+        $this->getApi('/me')
+            ->assertUnauthorized();
+    }
+
+    #[Test]
+    public function unauthenticated_user_cannot_update_profile(): void
+    {
+        $this->patchApi('/me', [
+            'name' => 'Updated Name',
+        ])
+            ->assertUnauthorized();
     }
 }
