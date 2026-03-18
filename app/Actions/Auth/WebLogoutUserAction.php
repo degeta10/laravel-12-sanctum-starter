@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class WebLogoutUserAction
+final class WebLogoutUserAction
 {
     public function execute(Request $request): void
     {

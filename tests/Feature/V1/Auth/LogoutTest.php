@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\V1\Auth;
 
 use PHPUnit\Framework\Attributes\Test;
 use Tests\ApiV1TestCase;
 
-class LogoutTest extends ApiV1TestCase
+final class LogoutTest extends ApiV1TestCase
 {
     #[Test]
     public function api_user_can_logout_and_revoke_token(): void
     {
         $user = $this->authUser();
 
-        $response = $this->postApi('/auth/logout');
+        $response = $this->postApi('/logout');
 
         $response->assertOk()
             ->assertJson(['success' => true]);
@@ -29,7 +31,7 @@ class LogoutTest extends ApiV1TestCase
         $this->get('/sanctum/csrf-cookie');
         $this->actingAs($user, 'web');
 
-        $response = $this->postWeb('/auth/logout');
+        $response = $this->postWeb('/logout');
 
         $response->assertOk()
             ->assertJson(['success' => true]);

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Requests;
 
 use App\Http\Requests\Auth\LoginRequest;
@@ -8,7 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
 use ReflectionMethod;
 use Tests\TestCase;
 
-class LoginRequestTest extends TestCase
+final class LoginRequestTest extends TestCase
 {
     #[Test]
     public function validation_passes_with_valid_payload(): void

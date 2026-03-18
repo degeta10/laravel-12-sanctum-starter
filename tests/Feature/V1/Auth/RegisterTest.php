@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature\V1\Auth;
 
 use PHPUnit\Framework\Attributes\Test;
 use Tests\ApiV1TestCase;
 
-class RegisterTest extends ApiV1TestCase
+final class RegisterTest extends ApiV1TestCase
 {
     #[Test]
     public function user_can_register_successfully(): void
@@ -17,7 +19,7 @@ class RegisterTest extends ApiV1TestCase
             'password_confirmation' => $this->userPassword,
         ];
 
-        $response = $this->postApi('/auth/register', $payload);
+        $response = $this->postApi('/register', $payload);
 
         $response->assertCreated()
             ->assertJsonStructure([

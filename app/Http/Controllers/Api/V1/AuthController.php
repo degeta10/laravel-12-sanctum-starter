@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api\V1;
 
 use App\Actions\Auth\ApiLoginUserAction;
@@ -18,7 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class AuthController extends Controller
+final class AuthController extends Controller
 {
     public function __construct(
         private readonly ApiLoginUserAction $loginUserAction,
@@ -45,29 +47,11 @@ class AuthController extends Controller
             : $this->apiLogin($request);
     }
 
-    private function apiLogin(LoginRequest $request): JsonResponse
-    {
-        $result = $this->loginUserAction->execute($request->validated());
-
-        if (! $result) {
-            return response()->error(Response::HTTP_UNAUTHORIZED, 'Invalid credentials');
-        }
-
-        return response()->success(
-            Response::HTTP_OK,
-            'Login successful',
-            new AuthResource([
-                'access_token' => $result['token'],
-                'user' => $result['user'],
-            ])
-        );
-    }
-
     public function webLogin(LoginRequest $request): JsonResponse
     {
         $user = $this->webLoginAction->execute($request->validated(), $request);
 
-        if (! $user) {
+        if (! $user instanceof \App\Models\User) {
             return response()->error(
                 Response::HTTP_UNAUTHORIZED,
                 'Invalid credentials',
@@ -130,6 +114,24 @@ class AuthController extends Controller
         return response()->success(
             Response::HTTP_OK,
             'Logged out successfully',
+        );
+    }
+
+    private function apiLogin(LoginRequest $request): JsonResponse
+    {
+        $result = $this->loginUserAction->execute($request->validated());
+
+        if (! $result) {
+            return response()->error(Response::HTTP_UNAUTHORIZED, 'Invalid credentials');
+        }
+
+        return response()->success(
+            Response::HTTP_OK,
+            'Login successful',
+            new AuthResource([
+                'access_token' => $result['token'],
+                'user' => $result['user'],
+            ])
         );
     }
 }

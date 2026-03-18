@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\User;
 
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-class UpdateMeAction
+final class UpdateMeAction
 {
     /**
      * Update the given user's profile with the provided data.

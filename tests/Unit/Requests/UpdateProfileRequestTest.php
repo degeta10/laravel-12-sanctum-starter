@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Requests;
 
 use App\Http\Requests\Auth\UpdateProfileRequest;
@@ -7,7 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class UpdateProfileRequestTest extends TestCase
+final class UpdateProfileRequestTest extends TestCase
 {
     #[Test]
     public function validation_passes_with_empty_payload_due_to_sometimes_rules(): void

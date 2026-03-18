@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Exceptions;
 
 use Illuminate\Auth\AuthenticationException;
@@ -10,9 +12,9 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
-class Handler
+final class Handler
 {
-    protected array $map = [
+    private array $map = [
         ThrottleRequestsException::class => [
             'status' => Response::HTTP_TOO_MANY_REQUESTS,
             'message' => 'Too many attempts, please try after a minute.',
