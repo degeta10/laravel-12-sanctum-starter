@@ -21,13 +21,9 @@ use Illuminate\Http\Request;
 
 final class AuthController extends Controller
 {
-    public function __construct(
-        private readonly ApiLoginUserAction $apiLoginAction,
-        private readonly WebLoginUserAction $webLoginAction,
-        private readonly ApiLogoutUserAction $apiLogoutAction,
-        private readonly WebLogoutUserAction $webLogoutAction,
-    ) {}
-
+    /**
+     * Handle user registration.
+     */
     public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
         $action->execute($request->validated());
@@ -35,13 +31,33 @@ final class AuthController extends Controller
         return $this->created();
     }
 
-    public function login(LoginRequest $request): JsonResponse
-    {
-        return $request->hasSession()
-            ? $this->webLogin($request)
-            : $this->apiLogin($request);
+    /**
+     * Handle user login for both API and Web clients.
+     * Determines the type of login based on the presence of a session.
+     */
+    public function login(
+        LoginRequest $request,
+        ApiLoginUserAction $apiLoginAction,
+        WebLoginUserAction $webLoginAction
+    ): JsonResponse {
+        $isWeb = $request->hasSession();
+
+        $result = $isWeb
+            ? $webLoginAction->execute($request->validated(), $request)
+            : $apiLoginAction->execute($request->validated());
+
+        if (! $result) {
+            return $this->unauthorized('Invalid credentials');
+        }
+
+        return $this->success(
+            $isWeb ? new UserResource($result) : new AuthResource($result)
+        );
     }
 
+    /**
+     * Retrieve the authenticated user's details.
+     */
     public function getMe(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -51,6 +67,9 @@ final class AuthController extends Controller
         );
     }
 
+    /**
+     * Update the authenticated user's profile.
+     */
     public function updateMe(UpdateProfileRequest $request, UpdateMeAction $action): JsonResponse
     {
         $updatedUser = $action->execute(
@@ -63,40 +82,18 @@ final class AuthController extends Controller
         );
     }
 
-    public function logout(Request $request): JsonResponse
-    {
-        if ($request->hasSession()) {
-            $this->webLogoutAction->execute($request);
-        } else {
-            $this->apiLogoutAction->execute($request);
-        }
+    /**
+     * Logout the user by determining the request type (API or Web) and executing the appropriate logout action.
+     */
+    public function logout(
+        Request $request,
+        ApiLogoutUserAction $apiLogoutAction,
+        WebLogoutUserAction $webLogoutAction
+    ): JsonResponse {
+        $request->hasSession()
+            ? $webLogoutAction->execute($request)
+            : $apiLogoutAction->execute($request);
 
         return $this->success();
-    }
-
-    private function apiLogin(LoginRequest $request): JsonResponse
-    {
-        $result = $this->apiLoginAction->execute($request->validated());
-
-        if (! $result) {
-            return $this->unauthorized('Invalid credentials');
-        }
-
-        return $this->success(
-            new AuthResource($result)
-        );
-    }
-
-    private function webLogin(LoginRequest $request): JsonResponse
-    {
-        $user = $this->webLoginAction->execute($request->validated(), $request);
-
-        if (!$user instanceof \App\Models\User) {
-            return $this->unauthorized('Invalid credentials');
-        }
-
-        return $this->success(
-            new UserResource($user)
-        );
     }
 }
