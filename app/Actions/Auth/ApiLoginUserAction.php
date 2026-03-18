@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Hash;
 
 final class ApiLoginUserAction
 {
+    /**
+     * Authenticate the user and return an access token.
+     *
+     * @return array{user: User, access_token: string}|null
+     */
     public function execute(array $credentials): ?array
     {
         $user = User::where('email', $credentials['email'])->first();
@@ -22,7 +27,7 @@ final class ApiLoginUserAction
 
         return [
             'user' => $user,
-            'token' => $token,
+            'access_token' => $token,
         ];
     }
 }

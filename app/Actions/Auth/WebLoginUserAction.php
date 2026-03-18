@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 final class WebLoginUserAction
 {
+    /**
+     * Authenticate the user using the provided credentials and start a session.
+     */
     public function execute(array $credentials, Request $request): ?User
     {
         if (! Auth::attempt($credentials)) {
